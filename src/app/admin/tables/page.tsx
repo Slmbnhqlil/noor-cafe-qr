@@ -37,8 +37,8 @@ export default function AdminTables() {
     <div>
       <div className="card p-5 mb-6">
         <h2 className="serif text-lg text-coffee-800 mb-3">Masa Ekle</h2>
-        <div className="flex gap-2">
-          <input className="input" placeholder="Masa numarası (örn. 5)" value={num} onChange={(e) => setNum(e.target.value)} />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input className="input flex-1" placeholder="Masa numarası (örn. 5)" value={num} onChange={(e) => setNum(e.target.value)} />
           <button onClick={add} className="btn-primary"><Plus size={14} /> Ekle</button>
         </div>
         <p className="text-xs text-coffee-500 mt-2">

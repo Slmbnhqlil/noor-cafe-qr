@@ -26,26 +26,26 @@ export default function CartPage() {
         <>
           <div className="space-y-3">
             {items.map((i) => (
-              <div key={i.itemId} className="card p-4 flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-coffee-100 flex items-center justify-center serif text-coffee-400 text-xl">
+              <div key={i.itemId} className="card p-3 sm:p-4 flex items-center gap-2 sm:gap-3 overflow-hidden">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-coffee-100 flex items-center justify-center serif text-coffee-400 text-xl flex-shrink-0">
                   ✦
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="serif text-coffee-800 truncate">{i.name}</p>
-                  <p className="text-sm text-coffee-600">
+                  <p className="serif text-sm sm:text-base text-coffee-800 truncate">{i.name}</p>
+                  <p className="text-xs sm:text-sm text-coffee-600">
                     {CURRENCY}{i.price} × {i.qty} = <span className="text-coffee-800 font-medium">{CURRENCY}{i.price * i.qty}</span>
                   </p>
                 </div>
-                <div className="flex items-center gap-1 bg-coffee-50 rounded-full p-1">
-                  <button onClick={() => setQty(i.itemId, i.qty - 1)} className="w-8 h-8 rounded-full hover:bg-coffee-100 flex items-center justify-center">
+                <div className="flex items-center gap-0.5 bg-coffee-50 rounded-full p-1 flex-shrink-0">
+                  <button onClick={() => setQty(i.itemId, i.qty - 1)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full hover:bg-coffee-100 flex items-center justify-center">
                     <Minus size={14} />
                   </button>
-                  <span className="w-8 text-center text-sm">{i.qty}</span>
-                  <button onClick={() => setQty(i.itemId, i.qty + 1)} className="w-8 h-8 rounded-full hover:bg-coffee-100 flex items-center justify-center">
+                  <span className="w-6 sm:w-8 text-center text-sm">{i.qty}</span>
+                  <button onClick={() => setQty(i.itemId, i.qty + 1)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full hover:bg-coffee-100 flex items-center justify-center">
                     <Plus size={14} />
                   </button>
                 </div>
-                <button onClick={() => remove(i.itemId)} className="p-2 text-coffee-400 hover:text-red-500">
+                <button onClick={() => remove(i.itemId)} className="p-1.5 sm:p-2 text-coffee-400 hover:text-red-500 flex-shrink-0">
                   <Trash2 size={16} />
                 </button>
               </div>

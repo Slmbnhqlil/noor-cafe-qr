@@ -13,7 +13,12 @@ export const metadata: Metadata = {
   title: `${CAFE_NAME} — QR Menü & Sipariş`,
   description: "Sade. Şık. Sıcak bir nefes. QR menü ile masanızdan kolay sipariş."
 };
-export const viewport: Viewport = { themeColor: "#3F2C1A" };
+export const viewport: Viewport = {
+  themeColor: "#3F2C1A",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

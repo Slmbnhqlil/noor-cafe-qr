@@ -23,9 +23,9 @@ function HomeInner() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto max-w-5xl px-4 pt-12 pb-16 sm:pt-20 sm:pb-24 text-center">
+        <div className="mx-auto max-w-5xl px-4 pt-10 pb-12 sm:pt-20 sm:pb-24 text-center">
           <p className="label text-coffee-500">QR Menü & Sipariş</p>
-          <h1 className="mt-3 text-4xl sm:text-6xl serif text-coffee-800">
+          <h1 className="mt-3 text-3xl sm:text-6xl serif text-coffee-800">
             {CAFE_NAME}
           </h1>
           <p className="mt-4 text-coffee-600 max-w-md mx-auto">
