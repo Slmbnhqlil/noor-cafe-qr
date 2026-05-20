@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { listenAllOrders, seedIfEmpty } from "@/lib/menuService";
+import { listenAllOrders } from "@/lib/menuService";
 import { Order } from "@/types";
 import { CURRENCY } from "@/lib/firebase";
-import toast from "react-hot-toast";
+import Link from "next/link";
 
 export default function Dashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -19,14 +19,9 @@ export default function Dashboard() {
   const completed = todays.filter((o) => o.status === "delivered");
   const revenue = completed.reduce((s, o) => s + o.subtotal, 0);
 
-  const seed = async () => {
-    try { await seedIfEmpty(); toast.success("Örnek menü yüklendi"); }
-    catch (e: any) { toast.error(e.message); }
-  };
-
   return (
     <div>
-      <div className="grid sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Stat label="Bugün" value={todays.length} />
         <Stat label="Bekleyen" value={pending.length} accent />
         <Stat label="Tamamlanan" value={completed.length} />
@@ -35,10 +30,11 @@ export default function Dashboard() {
 
       <div className="card p-6 mt-6">
         <h2 className="serif text-lg text-coffee-800 mb-3">Hızlı İşlemler</h2>
-        <button onClick={seed} className="btn-ghost">Firestore'a örnek menüyü yükle</button>
-        <p className="text-xs text-coffee-500 mt-2">
-          İlk kurulumda Firestore koleksiyonları boşsa örnek kategorileri ve ürünleri yükler.
-        </p>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/admin/orders" className="btn-ghost">Siparişleri yönet</Link>
+          <Link href="/admin/menu" className="btn-ghost">Menüyü düzenle</Link>
+          <Link href="/admin/tables" className="btn-ghost">Masa & QR</Link>
+        </div>
       </div>
     </div>
   );

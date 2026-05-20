@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Menü herkese açık okunur. Yazma şimdilik açık (test modu).
+    // ÜRETİME GEÇERKEN: admin yazımını Firebase Auth ile sınırla
+    // veya admin işlemlerini sunucu API route'una taşı.
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /menuItems/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /tables/{id} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Siparişler: müşteri oluşturabilir ve kendi siparişini okuyabilir.
+    match /orders/{id} {
+      allow create: if true;
+      allow read: if true;       // müşteri sipariş takibi için
+      allow update, delete: if true; // admin durum güncellemesi (test modu)
+    }
+  }
+}

@@ -5,6 +5,7 @@ import { fetchCategories, fetchItems, upsertCategory, upsertItem, deleteCategory
 import toast from "react-hot-toast";
 import { CURRENCY } from "@/lib/firebase";
 import { Plus, Trash2 } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
 
 export default function AdminMenu() {
   const [cats, setCats] = useState<Category[]>([]);
@@ -102,8 +103,17 @@ export default function AdminMenu() {
                 {cats.map((c) => <option key={c.id} value={c.id}>{c.name.tr}</option>)}
               </select>
             </Field>
-            <Field label="Görsel URL"><input className="input" value={editing.image || ""} onChange={(e) => setEditing({ ...editing, image: e.target.value })} /></Field>
             <Field label="Hazırlama (dk)"><input type="number" className="input" value={editing.prepMinutes || 0} onChange={(e) => setEditing({ ...editing, prepMinutes: Number(e.target.value) })} /></Field>
+            <div className="col-span-2">
+              <label className="label">Ürün Görseli</label>
+              <div className="mt-1">
+                <ImageUpload
+                  value={editing.image}
+                  itemId={editing.id}
+                  onChange={(url) => setEditing({ ...editing, image: url })}
+                />
+              </div>
+            </div>
             <label className="flex items-center gap-2 col-span-2"><input type="checkbox" checked={editing.available} onChange={(e) => setEditing({ ...editing, available: e.target.checked })} /> Aktif</label>
             <label className="flex items-center gap-2 col-span-2"><input type="checkbox" checked={!!editing.popular} onChange={(e) => setEditing({ ...editing, popular: e.target.checked })} /> Popüler</label>
           </div>

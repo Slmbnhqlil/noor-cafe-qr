@@ -3,27 +3,43 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { Category, MenuItem, Order, OrderStatus, Table } from "@/types";
-import { seedCategories, seedItems } from "@/data/seedMenu";
 
-// ---------- Read ----------
-export async function fetchCategories(): Promise<Category[]> {
+const CACHE_CATS = "noor-cache-cats";
+const CACHE_ITEMS = "noor-cache-items";
+
+function readCache<T>(key: string): T | null {
+  if (typeof window === "undefined") return null;
   try {
-    const snap = await getDocs(query(collection(db(), "categories"), orderBy("order", "asc")));
-    if (snap.empty) return seedCategories;
-    return snap.docs.map(d => ({ id: d.id, ...(d.data() as Omit<Category, "id">) }));
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
   } catch {
-    return seedCategories;
+    return null;
   }
 }
+function writeCache(key: string, data: unknown) {
+  if (typeof window === "undefined") return;
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch { /* quota */ }
+}
 
-export async function fetchItems(): Promise<MenuItem[]> {
-  try {
-    const snap = await getDocs(collection(db(), "menuItems"));
-    if (snap.empty) return seedItems;
-    return snap.docs.map(d => ({ id: d.id, ...(d.data() as Omit<MenuItem, "id">) }));
-  } catch {
-    return seedItems;
-  }
+// ---------- Read ----------
+// Anlık görüntüleme için: önbellekten varsa hemen döndürür (onCache),
+// ardından Firestore'dan tazeyi getirir.
+export async function fetchCategories(onCache?: (c: Category[]) => void): Promise<Category[]> {
+  const cached = readCache<Category[]>(CACHE_CATS);
+  if (cached && onCache) onCache(cached);
+  const snap = await getDocs(query(collection(db(), "categories"), orderBy("order", "asc")));
+  const data = snap.docs.map(d => ({ id: d.id, ...(d.data() as Omit<Category, "id">) }));
+  writeCache(CACHE_CATS, data);
+  return data;
+}
+
+export async function fetchItems(onCache?: (i: MenuItem[]) => void): Promise<MenuItem[]> {
+  const cached = readCache<MenuItem[]>(CACHE_ITEMS);
+  if (cached && onCache) onCache(cached);
+  const snap = await getDocs(collection(db(), "menuItems"));
+  const data = snap.docs.map(d => ({ id: d.id, ...(d.data() as Omit<MenuItem, "id">) }));
+  writeCache(CACHE_ITEMS, data);
+  return data;
 }
 
 // ---------- Write (admin) ----------
@@ -39,18 +55,6 @@ export async function upsertItem(i: MenuItem) {
 }
 export async function deleteItem(id: string) {
   await deleteDoc(doc(db(), "menuItems", id));
-}
-
-// ---------- Seed ----------
-export async function seedIfEmpty() {
-  const cats = await getDocs(collection(db(), "categories"));
-  if (cats.empty) {
-    for (const c of seedCategories) await upsertCategory(c);
-  }
-  const items = await getDocs(collection(db(), "menuItems"));
-  if (items.empty) {
-    for (const it of seedItems) await upsertItem(it);
-  }
 }
 
 // ---------- Orders ----------

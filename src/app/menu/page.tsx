@@ -13,13 +13,16 @@ export default function MenuPage() {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [active, setActive] = useState<string>("all");
   const [q, setQ] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      const [c, i] = await Promise.all([fetchCategories(), fetchItems()]);
-      setCats(c.sort((a, b) => a.order - b.order));
-      setItems(i);
-    })();
+    let alive = true;
+    // Önbellek varsa anında göster
+    const applyCats = (c: Category[]) => { if (alive) { setCats([...c].sort((a, b) => a.order - b.order)); setLoading(false); } };
+    const applyItems = (i: MenuItem[]) => { if (alive) setItems(i); };
+    fetchCategories(applyCats).then(applyCats).catch(() => {});
+    fetchItems(applyItems).then(applyItems).finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
   }, []);
 
   const filtered = useMemo(() => {
@@ -78,13 +81,29 @@ export default function MenuPage() {
 
       {/* Items */}
       <div className="grid sm:grid-cols-2 gap-4">
-        {filtered.map((i) => (
-          <MenuItemCard key={i.id} item={i} />
-        ))}
-        {filtered.length === 0 && (
-          <p className="text-center text-coffee-500 col-span-2 py-12">
-            {lang === "tr" ? "Sonuç bulunamadı." : "No results."}
-          </p>
+        {loading && items.length === 0 ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="card p-3 sm:p-4 flex gap-3 sm:gap-4 animate-pulse">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-coffee-100 flex-shrink-0" />
+              <div className="flex-1 space-y-2 py-1">
+                <div className="h-4 bg-coffee-100 rounded w-2/3" />
+                <div className="h-3 bg-coffee-100 rounded w-full" />
+                <div className="h-3 bg-coffee-100 rounded w-1/2" />
+                <div className="h-6 bg-coffee-100 rounded w-1/3 mt-3" />
+              </div>
+            </div>
+          ))
+        ) : (
+          <>
+            {filtered.map((i) => (
+              <MenuItemCard key={i.id} item={i} />
+            ))}
+            {filtered.length === 0 && (
+              <p className="text-center text-coffee-500 col-span-2 py-12">
+                {lang === "tr" ? "Sonuç bulunamadı." : "No results."}
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>
