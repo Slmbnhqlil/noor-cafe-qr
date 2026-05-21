@@ -21,7 +21,14 @@ export const useCart = create<CartState>()(
     (set, get) => ({
       items: [],
       tableNumber: "",
-      setTable: (n) => set({ tableNumber: n }),
+      setTable: (n) =>
+        set((s) => {
+          // Farklı bir masa QR'ı okutulduysa o masanın sepetiyle başla (öncekini temizle)
+          if (s.tableNumber && s.tableNumber !== n) {
+            return { tableNumber: n, items: [] };
+          }
+          return { tableNumber: n };
+        }),
       add: (item) =>
         set((s) => {
           const ex = s.items.find((i) => i.itemId === item.itemId);
