@@ -16,15 +16,15 @@ export default function Dashboard() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const todays = orders.filter((o) => o.createdAt >= today.getTime());
   const pending = orders.filter((o) => ["new", "preparing", "ready"].includes(o.status));
-  const completed = todays.filter((o) => o.status === "delivered");
-  const revenue = completed.reduce((s, o) => s + o.subtotal, 0);
+  const paid = todays.filter((o) => o.status === "paid");
+  const revenue = paid.reduce((s, o) => s + o.subtotal, 0);
 
   return (
     <div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Stat label="Bugün" value={todays.length} />
         <Stat label="Bekleyen" value={pending.length} accent />
-        <Stat label="Tamamlanan" value={completed.length} />
+        <Stat label="Ödeme Alındı" value={paid.length} />
         <Stat label="Gelir" value={`${CURRENCY}${revenue}`} />
       </div>
 

@@ -83,12 +83,14 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
   await updateDoc(doc(db(), "orders", id), { status, updatedAt: Date.now() });
 }
 
-// Bir masanın tüm siparişlerini canlı dinler (o masaya giren herkes görür)
+// Bir masanın siparişlerini canlı dinler (o masaya giren herkes görür).
+// Ödemesi alınan ("paid") siparişler müşteriye gösterilmez — masa kalkmış sayılır.
 export function listenOrdersByTable(tableNumber: string, cb: (orders: Order[]) => void) {
   return onSnapshot(
     query(collection(db(), "orders"), where("tableNumber", "==", tableNumber)),
     snap => {
-      const list = snap.docs.map(d => ({ id: d.id, ...(d.data() as any) })) as Order[];
+      const list = (snap.docs.map(d => ({ id: d.id, ...(d.data() as any) })) as Order[])
+        .filter(o => o.status !== "paid");
       list.sort((a, b) => b.createdAt - a.createdAt);
       cb(list);
     }

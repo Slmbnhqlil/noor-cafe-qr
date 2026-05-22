@@ -36,6 +36,11 @@ export default function OrderDetail() {
       <div className="card p-6 mt-6">
         {order.status === "cancelled" ? (
           <p className="text-red-600 text-center">{t(lang, "status_cancelled")}</p>
+        ) : order.status === "paid" ? (
+          <p className="text-center text-coffee-700">
+            <CheckCircle2 className="mx-auto text-green-600 mb-2" size={28} />
+            {lang === "tr" ? "Ödemeniz alındı. Teşekkür ederiz!" : "Payment received. Thank you!"}
+          </p>
         ) : (
           <div className="space-y-3">
             {steps.map((s, i) => {

@@ -34,6 +34,7 @@ export type OrderStatus =
   | "preparing"
   | "ready"
   | "delivered"
+  | "paid"
   | "cancelled";
 
 export type Order = {

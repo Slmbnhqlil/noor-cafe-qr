@@ -5,15 +5,16 @@ import { Order, OrderStatus } from "@/types";
 import { CURRENCY } from "@/lib/firebase";
 import toast from "react-hot-toast";
 
-const STATUSES: OrderStatus[] = ["new", "preparing", "ready", "delivered", "cancelled"];
+const STATUSES: OrderStatus[] = ["new", "preparing", "ready", "delivered", "paid", "cancelled"];
 const labels: Record<OrderStatus, string> = {
-  new: "Yeni", preparing: "Hazırlanıyor", ready: "Hazır", delivered: "Teslim", cancelled: "İptal"
+  new: "Yeni", preparing: "Hazırlanıyor", ready: "Hazır", delivered: "Teslim", paid: "Ödeme Alındı", cancelled: "İptal"
 };
 const colors: Record<OrderStatus, string> = {
   new: "bg-blue-100 text-blue-700",
   preparing: "bg-amber-100 text-amber-700",
   ready: "bg-emerald-100 text-emerald-700",
   delivered: "bg-coffee-100 text-coffee-700",
+  paid: "bg-green-600 text-white",
   cancelled: "bg-red-100 text-red-700"
 };
 
