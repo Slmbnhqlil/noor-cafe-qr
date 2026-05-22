@@ -12,12 +12,28 @@ export default function AdminMenu() {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [editing, setEditing] = useState<MenuItem | null>(null);
   const [editingCat, setEditingCat] = useState<Category | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const reload = async () => {
     setCats((await fetchCategories()).sort((a, b) => a.order - b.order));
     setItems(await fetchItems());
   };
   useEffect(() => { reload(); }, []);
+
+  // TR -> EN otomatik çeviri (sunucu endpoint'i)
+  const translate = async (texts: string[]): Promise<string[]> => {
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texts })
+      });
+      const data = await res.json();
+      return Array.isArray(data.translations) ? data.translations : texts;
+    } catch {
+      return texts;
+    }
+  };
 
   const newItem = (): MenuItem => ({
     id: "yeni-" + Date.now(),
@@ -30,13 +46,32 @@ export default function AdminMenu() {
 
   const saveItem = async () => {
     if (!editing) return;
-    try { await upsertItem(editing); toast.success("Kaydedildi"); setEditing(null); reload(); }
-    catch (e: any) { toast.error(e.message); }
+    if (!editing.name.tr.trim()) { toast.error("Ürün adı gerekli"); return; }
+    setSaving(true);
+    try {
+      const [enName, enDesc] = await translate([editing.name.tr, editing.description.tr]);
+      const toSave: MenuItem = {
+        ...editing,
+        name: { tr: editing.name.tr, en: enName || editing.name.tr },
+        description: { tr: editing.description.tr, en: enDesc || editing.description.tr }
+      };
+      await upsertItem(toSave);
+      toast.success("Kaydedildi (EN otomatik çevrildi)");
+      setEditing(null); reload();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setSaving(false); }
   };
   const saveCat = async () => {
     if (!editingCat) return;
-    try { await upsertCategory(editingCat); toast.success("Kaydedildi"); setEditingCat(null); reload(); }
-    catch (e: any) { toast.error(e.message); }
+    if (!editingCat.name.tr.trim()) { toast.error("Kategori adı gerekli"); return; }
+    setSaving(true);
+    try {
+      const [enName] = await translate([editingCat.name.tr]);
+      await upsertCategory({ ...editingCat, name: { tr: editingCat.name.tr, en: enName || editingCat.name.tr } });
+      toast.success("Kaydedildi (EN otomatik çevrildi)");
+      setEditingCat(null); reload();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setSaving(false); }
   };
   const removeItem = async (id: string) => {
     if (!confirm("Silinsin mi?")) return;
@@ -93,10 +128,8 @@ export default function AdminMenu() {
       {editing && (
         <Modal onClose={() => setEditing(null)} title="Ürün">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Ad (TR)"><input className="input" value={editing.name.tr} onChange={(e) => setEditing({ ...editing, name: { ...editing.name, tr: e.target.value } })} /></Field>
-            <Field label="Ad (EN)"><input className="input" value={editing.name.en} onChange={(e) => setEditing({ ...editing, name: { ...editing.name, en: e.target.value } })} /></Field>
-            <Field label="Açıklama (TR)"><input className="input" value={editing.description.tr} onChange={(e) => setEditing({ ...editing, description: { ...editing.description, tr: e.target.value } })} /></Field>
-            <Field label="Açıklama (EN)"><input className="input" value={editing.description.en} onChange={(e) => setEditing({ ...editing, description: { ...editing.description, en: e.target.value } })} /></Field>
+            <div className="col-span-2"><Field label="Ad"><input className="input" value={editing.name.tr} onChange={(e) => setEditing({ ...editing, name: { ...editing.name, tr: e.target.value } })} placeholder="Türkçe yazın — İngilizcesi otomatik çevrilir" /></Field></div>
+            <div className="col-span-2"><Field label="Açıklama"><input className="input" value={editing.description.tr} onChange={(e) => setEditing({ ...editing, description: { ...editing.description, tr: e.target.value } })} placeholder="Türkçe yazın — İngilizcesi otomatik çevrilir" /></Field></div>
             <Field label="Fiyat"><input type="number" className="input" value={editing.price} onChange={(e) => setEditing({ ...editing, price: Number(e.target.value) })} /></Field>
             <Field label="Kategori">
               <select className="input" value={editing.categoryId} onChange={(e) => setEditing({ ...editing, categoryId: e.target.value })}>
@@ -136,8 +169,8 @@ export default function AdminMenu() {
             <label className="flex items-center gap-2 col-span-2"><input type="checkbox" checked={!!editing.popular} onChange={(e) => setEditing({ ...editing, popular: e.target.checked })} /> Popüler</label>
           </div>
           <div className="mt-4 flex justify-end gap-2">
-            <button onClick={() => setEditing(null)} className="btn-ghost">İptal</button>
-            <button onClick={saveItem} className="btn-primary">Kaydet</button>
+            <button onClick={() => setEditing(null)} className="btn-ghost" disabled={saving}>İptal</button>
+            <button onClick={saveItem} className="btn-primary" disabled={saving}>{saving ? "Çevriliyor…" : "Kaydet"}</button>
           </div>
         </Modal>
       )}
@@ -146,14 +179,13 @@ export default function AdminMenu() {
       {editingCat && (
         <Modal onClose={() => setEditingCat(null)} title="Kategori">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Ad (TR)"><input className="input" value={editingCat.name.tr} onChange={(e) => setEditingCat({ ...editingCat, name: { ...editingCat.name, tr: e.target.value } })} /></Field>
-            <Field label="Ad (EN)"><input className="input" value={editingCat.name.en} onChange={(e) => setEditingCat({ ...editingCat, name: { ...editingCat.name, en: e.target.value } })} /></Field>
+            <div className="col-span-2"><Field label="Ad"><input className="input" value={editingCat.name.tr} onChange={(e) => setEditingCat({ ...editingCat, name: { ...editingCat.name, tr: e.target.value } })} placeholder="Türkçe yazın — İngilizcesi otomatik çevrilir" /></Field></div>
             <Field label="Sıra"><input type="number" className="input" value={editingCat.order} onChange={(e) => setEditingCat({ ...editingCat, order: Number(e.target.value) })} /></Field>
             <Field label="İkon (emoji)"><input className="input" value={editingCat.icon || ""} onChange={(e) => setEditingCat({ ...editingCat, icon: e.target.value })} /></Field>
           </div>
           <div className="mt-4 flex justify-end gap-2">
-            <button onClick={() => setEditingCat(null)} className="btn-ghost">İptal</button>
-            <button onClick={saveCat} className="btn-primary">Kaydet</button>
+            <button onClick={() => setEditingCat(null)} className="btn-ghost" disabled={saving}>İptal</button>
+            <button onClick={saveCat} className="btn-primary" disabled={saving}>{saving ? "Çevriliyor…" : "Kaydet"}</button>
           </div>
         </Modal>
       )}
