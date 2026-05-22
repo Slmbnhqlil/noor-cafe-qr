@@ -66,8 +66,7 @@ export default function AdminTables() {
             <div className="bg-white p-3 inline-block rounded-xl mt-3">
               <QRCodeSVG value={url(t.number)} size={180} bgColor="#FFFFFF" fgColor="#3F2C1A" level="M" />
             </div>
-            <p className="text-[10px] text-coffee-400 mt-2 break-all">{url(t.number)}</p>
-            <p className="text-xs text-coffee-500 mt-2 serif hidden print:block">QR'ı okutarak menüyü açın</p>
+            <p className="text-xs text-coffee-500 mt-3 serif">QR'ı okutarak menüyü açın</p>
             <div className="mt-3 flex justify-center gap-2 print:hidden">
               <button onClick={() => window.print()} className="btn-ghost"><Printer size={14} /> Yazdır</button>
               <button onClick={() => remove(t.id)} className="btn-ghost text-red-600"><Trash2 size={14} /></button>
