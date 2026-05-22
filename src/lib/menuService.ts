@@ -2,7 +2,7 @@ import {
   collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, orderBy, onSnapshot, addDoc, updateDoc, serverTimestamp, where
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { Category, MenuItem, Order, OrderStatus, Table } from "@/types";
+import { Category, MenuItem, Order, OrderStatus, Table, CartItem } from "@/types";
 
 const CACHE_CATS = "noor-cache-cats";
 const CACHE_ITEMS = "noor-cache-items";
@@ -81,6 +81,28 @@ export function listenAllOrders(cb: (orders: Order[]) => void) {
 }
 export async function updateOrderStatus(id: string, status: OrderStatus) {
   await updateDoc(doc(db(), "orders", id), { status, updatedAt: Date.now() });
+}
+
+// Bir masanın tüm siparişlerini canlı dinler (o masaya giren herkes görür)
+export function listenOrdersByTable(tableNumber: string, cb: (orders: Order[]) => void) {
+  return onSnapshot(
+    query(collection(db(), "orders"), where("tableNumber", "==", tableNumber)),
+    snap => {
+      const list = snap.docs.map(d => ({ id: d.id, ...(d.data() as any) })) as Order[];
+      list.sort((a, b) => b.createdAt - a.createdAt);
+      cb(list);
+    }
+  );
+}
+
+// ---------- Ortak Sepet (masa bazlı, gerçek-zamanlı) ----------
+export function listenCart(tableNumber: string, cb: (items: CartItem[]) => void) {
+  return onSnapshot(doc(db(), "carts", tableNumber), snap => {
+    cb(snap.exists() ? ((snap.data().items as CartItem[]) || []) : []);
+  });
+}
+export async function saveCart(tableNumber: string, items: CartItem[]) {
+  await setDoc(doc(db(), "carts", tableNumber), { items, updatedAt: Date.now() });
 }
 
 // ---------- Tables ----------

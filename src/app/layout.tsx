@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CartSync from "@/components/CartSync";
 import { CAFE_NAME } from "@/lib/firebase";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="tr" className={`${inter.variable} ${playfair.variable}`}>
       <body className="min-h-screen flex flex-col bg-paper">
+        <CartSync />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

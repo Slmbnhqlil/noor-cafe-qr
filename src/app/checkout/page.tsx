@@ -46,8 +46,6 @@ export default function CheckoutPage() {
         customerName: name || undefined,
         phone: e164
       });
-      const list = JSON.parse(localStorage.getItem("noor-orders") || "[]");
-      localStorage.setItem("noor-orders", JSON.stringify([id, ...list].slice(0, 20)));
       clear();
       toast.success(t(lang, "orderReceived"));
       router.push(`/orders/${id}`);

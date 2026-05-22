@@ -18,6 +18,12 @@ service cloud.firestore {
       allow write: if true;
     }
 
+    // Ortak sepet (masa bazlı) — aynı masaya giren herkes okur/yazar
+    match /carts/{tableId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     // Siparişler: müşteri oluşturabilir ve kendi siparişini okuyabilir.
     match /orders/{id} {
       allow create: if true;
