@@ -35,7 +35,7 @@ export default function AdminTables() {
 
   return (
     <div>
-      <div className="card p-5 mb-6">
+      <div className="card p-5 mb-6 print:hidden">
         <h2 className="serif text-lg text-coffee-800 mb-3">Masa Ekle</h2>
         <div className="flex flex-col sm:flex-row gap-2">
           <input className="input flex-1" placeholder="Masa numarası (örn. 5)" value={num} onChange={(e) => setNum(e.target.value)} />
@@ -46,15 +46,28 @@ export default function AdminTables() {
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Yazdırma çubuğu */}
+      <div className="flex items-center justify-between mb-4 print:hidden">
+        <p className="text-sm text-coffee-600">{tables.length} masa</p>
+        <button
+          onClick={() => window.print()}
+          disabled={tables.length === 0}
+          className="btn-primary disabled:opacity-50"
+        >
+          <Printer size={16} /> Tüm QR'ları Yazdır
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 print:grid-cols-2 print:gap-3" id="qr-print-area">
         {tables.map((t) => (
-          <div key={t.id} className="card p-5 text-center">
+          <div key={t.id} className="card p-5 text-center break-inside-avoid print:shadow-none print:border print:border-coffee-300">
             <p className="label">{CAFE_NAME}</p>
             <p className="serif text-2xl text-coffee-800 mt-1">Masa {t.number}</p>
             <div className="bg-white p-3 inline-block rounded-xl mt-3">
               <QRCodeSVG value={url(t.number)} size={180} bgColor="#FFFFFF" fgColor="#3F2C1A" level="M" />
             </div>
             <p className="text-[10px] text-coffee-400 mt-2 break-all">{url(t.number)}</p>
+            <p className="text-xs text-coffee-500 mt-2 serif hidden print:block">QR'ı okutarak menüyü açın</p>
             <div className="mt-3 flex justify-center gap-2 print:hidden">
               <button onClick={() => window.print()} className="btn-ghost"><Printer size={14} /> Yazdır</button>
               <button onClick={() => remove(t.id)} className="btn-ghost text-red-600"><Trash2 size={14} /></button>
@@ -63,6 +76,14 @@ export default function AdminTables() {
         ))}
         {tables.length === 0 && <p className="text-coffee-500 col-span-full text-center py-8">Henüz masa yok.</p>}
       </div>
+
+      <style jsx global>{`
+        @media print {
+          header, footer { display: none !important; }
+          body { background: white !important; }
+          @page { margin: 1cm; }
+        }
+      `}</style>
     </div>
   );
 }

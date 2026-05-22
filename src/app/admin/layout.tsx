@@ -48,13 +48,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 print:hidden">
         <h1 className="serif text-2xl text-coffee-800">Yönetim Paneli</h1>
         <button onClick={logout} className="btn-ghost">
           <LogOut size={14} /> Çıkış
         </button>
       </div>
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6 print:hidden">
         {nav.map((n) => {
           const Icon = n.icon;
           const active = pathname?.startsWith(n.href);
