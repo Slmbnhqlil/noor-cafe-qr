@@ -105,6 +105,24 @@ export default function AdminMenu() {
             </Field>
             <Field label="Hazırlama (dk)"><input type="number" className="input" value={editing.prepMinutes || 0} onChange={(e) => setEditing({ ...editing, prepMinutes: Number(e.target.value) })} /></Field>
             <div className="col-span-2">
+              <Field label="Alerjenler (virgülle ayır)">
+                <input
+                  className="input"
+                  value={(editing.allergens || []).join(", ")}
+                  onChange={(e) =>
+                    setEditing({
+                      ...editing,
+                      allergens: e.target.value
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter(Boolean)
+                    })
+                  }
+                  placeholder="örn. süt, gluten, fıstık"
+                />
+              </Field>
+            </div>
+            <div className="col-span-2">
               <label className="label">Ürün Görseli</label>
               <div className="mt-1">
                 <ImageUpload
