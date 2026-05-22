@@ -17,7 +17,7 @@ export default function CheckoutPage() {
   const { lang } = useLang();
   const router = useRouter();
   const { items, subtotal, tableNumber, setTable, clear } = useCart();
-  const [table, setTableLocal] = useState(tableNumber);
+  const [table] = useState(tableNumber);
   const [note, setNote] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -100,8 +100,17 @@ export default function CheckoutPage() {
       {step === "form" ? (
         <form onSubmit={handleSendOtp} className="space-y-4">
           <div>
-            <label className="label">{t(lang, "tableNo")} *</label>
-            <input className="input mt-1" value={table} onChange={(e) => setTableLocal(e.target.value)} placeholder="12" required />
+            <label className="label">{t(lang, "tableNo")}</label>
+            <input
+              className="input mt-1 bg-coffee-50 text-coffee-700 cursor-not-allowed"
+              value={table || (isTr ? "QR okutarak gelin" : "Scan a QR")}
+              readOnly
+              aria-readonly="true"
+              tabIndex={-1}
+            />
+            <p className="text-xs text-coffee-500 mt-1">
+              {isTr ? "Masa numarası QR kodundan otomatik gelir, değiştirilemez." : "Table number is set automatically from the QR code."}
+            </p>
           </div>
           <div>
             <label className="label">{t(lang, "name")} <span className="text-coffee-400">({t(lang, "optional")})</span></label>
