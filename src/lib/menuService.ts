@@ -59,9 +59,14 @@ export async function deleteItem(id: string) {
 
 // ---------- Orders ----------
 export async function createOrder(o: Omit<Order, "id" | "createdAt" | "updatedAt" | "status">): Promise<string> {
-  const ref = await addDoc(collection(db(), "orders"), {
+  const payload: Record<string, any> = {
     ...o, status: "new" as OrderStatus, createdAt: Date.now(), updatedAt: Date.now()
-  });
+  };
+  // Firestore undefined değer kabul etmez — temizle
+  for (const k of Object.keys(payload)) {
+    if (payload[k] === undefined) delete payload[k];
+  }
+  const ref = await addDoc(collection(db(), "orders"), payload);
   return ref.id;
 }
 export function listenOrder(id: string, cb: (o: Order | null) => void) {
